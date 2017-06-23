@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 import os
 import shutil
+import cv2
 
 import numpy as np
 import socketio
@@ -47,6 +48,19 @@ controller = SimplePIController(0.1, 0.002)
 set_speed = 9
 controller.set_desired(set_speed)
 
+cropped_height = 66
+cropped_width = 200
+
+
+# Format image to [66, 320, 1]
+def format_image(X):
+    X_proc = np.zeros((cropped_height, cropped_width, 1))
+    
+    for x in range(0, cropped_width-1):
+        for y in range(0, cropped_height-1):
+            X_proc[y, x, 0] = X[y, x]
+    return X_proc
+
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -59,20 +73,25 @@ def telemetry(sid, data):
         speed = data["speed"]
         # The current image from the center camera of the car
         imgString = data["image"]
-        image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        ori_image = Image.open(BytesIO(base64.b64decode(imgString)))
+        image_array = np.asarray(ori_image)
+        image = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
+        image = image[70:70 + cropped_height, 60:60 + cropped_width]
+        image = format_image(image)
+        X_train_data = np.zeros((1, cropped_height, cropped_width, 1))
+        X_train_data[0] =  format_image(image)
+
+        steering_angle = float(model.predict(X_train_data, batch_size=1))
 
         throttle = controller.update(float(speed))
 
-        print(steering_angle, throttle)
         send_control(steering_angle, throttle)
-
+        
+        base_path = './recorded_images/'
         # save frame
-        if args.image_folder != '':
-            timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
-            image_filename = os.path.join(args.image_folder, timestamp)
-            image.save('{}.jpg'.format(image_filename))
+        timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
+        image_filename = os.path.join(base_path, timestamp)
+        # ori_image.save('{}.jpg'.format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.
         sio.emit('manual', data={}, skip_sid=True)
@@ -95,23 +114,11 @@ def send_control(steering_angle, throttle):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Remote Driving')
-    parser.add_argument(
-        'model',
-        type=str,
-        help='Path to model h5 file. Model should be on the same path.'
-    )
-    parser.add_argument(
-        'image_folder',
-        type=str,
-        nargs='?',
-        default='',
-        help='Path to image folder. This is where the images from the run will be saved.'
-    )
-    args = parser.parse_args()
 
     # check that model Keras version is same as local Keras version
-    f = h5py.File(args.model, mode='r')
+    model_file = 'model.h5'
+    # f = h5py.File(args.model, mode='r')
+    f = h5py.File(model_file, mode='r')    
     model_version = f.attrs.get('keras_version')
     keras_version = str(keras_version).encode('utf8')
 
@@ -119,20 +126,20 @@ if __name__ == '__main__':
         print('You are using Keras version ', keras_version,
               ', but the model was built using ', model_version)
 
-    model = load_model(args.model)
-
-    if args.image_folder != '':
-        print("Creating image folder at {}".format(args.image_folder))
-        if not os.path.exists(args.image_folder):
-            os.makedirs(args.image_folder)
+    model = load_model(model_file)
+    recored_images_folder = 'recorded_images'
+    if recored_images_folder != '':
+        print("Creating image folder at {}".format(recored_images_folder))
+        if not os.path.exists(recored_images_folder):
+            os.makedirs(recored_images_folder)
         else:
-            shutil.rmtree(args.image_folder)
-            os.makedirs(args.image_folder)
+            shutil.rmtree(recored_images_folder)
+            os.makedirs(recored_images_folder)
         print("RECORDING THIS RUN ...")
     else:
         print("NOT RECORDING THIS RUN ...")
 
-    # wrap Flask application with engineio's middleware
+    # wrap Flask application with engineio's mi
     app = socketio.Middleware(sio, app)
 
     # deploy as an eventlet WSGI server
