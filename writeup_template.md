@@ -163,24 +163,18 @@ the system performs the following preprocess:
 6) Cropp images from 132 * 320 to 66 * 200
 7) Created the flipped (horiz mirror) version of images and of angles
 
-Original angles histogram:
-[hist 01]: ./examples/hist01.png
 
-Filtered center angles histogram:
-[hist 02]: ./examples/hist02.png
+[hist 01]: ./examples/hist01.png "Original angles histogram"
 
-Center image sample:
-[center 01]: ./examples/center01.png
+[hist 02]: ./examples/hist02.png "Filtered center angles histogram"
 
-Soft center image sample:
-[center 02]: ./examples/center02.png
+[image1]: ./examples/center01.png "Center image sample"
 
-Recovery:
-[recovery 01]: ./examples/recovery01.png
+[image2]: ./examples/center02.png "Soft center image sample"
 
-Soft recovery:
-[recovery 02]: ./examples/recovery02.png
+[image3]: ./examples/recovery01.png "Recovery"
 
+[image4]: ./examples/recovery02.png "Soft recovery"
 
 Form this resulting set I used 80% for training and 20% for validation.
 
