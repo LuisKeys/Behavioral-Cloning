@@ -192,21 +192,18 @@ the system performs the following preprocess:
 6) Cropp images from 132 * 320 to 66 * 200
 7) Created the flipped (horiz mirror) version of images and of angles
 
-
-[image1]: ./examples/hist01.jpg "Original angles histogram"
-
-[image1]: ./examples/hist02.jpg "Filtered center angles histogram"
-
-[image3]: ./examples/center01.jpg "Center image sample"
-
-[image4]: ./examples/center02.jpg "Soft center image sample"
-
-[image5]: ./examples/recovery01.jpg "Recovery"
-
-[image6]: ./examples/recovery02.jpg "Soft recovery"
-
 Form this resulting set I used 80% for training and 20% for validation.
 
 I found that for this covnet and for the selected data 6 epochs was optimal, 
 although with more epochs error was lower, with just 6 the model gemeralized 
 quite good and this prevented overfitting.
+
+[//]: # (Image References)
+
+[image1]: ./examples/hist01.png "Original angles histogram"
+[image1]: ./examples/hist02.png "Filtered center angles histogram"
+[image1]: ./examples/epochs.png "Original angles histogram"
+[image3]: ./examples/center01.jpg "Center image sample"
+[image4]: ./examples/center02.jpg "Soft center image sample"
+[image5]: ./examples/recovery01.jpg "Recovery"
+[image6]: ./examples/recovery02.jpg "Soft recovery"
