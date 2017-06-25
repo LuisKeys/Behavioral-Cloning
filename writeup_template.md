@@ -66,7 +66,9 @@ and Relu activation functions:
 
 Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
 model.add(Conv2D(24, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Conv2D(36, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Conv2D(48, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 
 Two more convolutional layers of 64 of deph each follows with the same regularization factor as the previous 3 layers:,
@@ -74,6 +76,7 @@ and also with Relu activations:
 
 Add 2 * 3x3 convolution layers (output depth 64, and 64)
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 
 Add a flatten layer
@@ -82,8 +85,11 @@ model.add(Flatten())
 Finally after a flatten operation, 4 fully connected layers of 100, 50, 10 and 1 were added:
 4 Fully connected layers of 100, 50, 10 and 1
 model.add(Dense(100, kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Dense(50, kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Dense(10, kernel_regularizer=l2(reg_factor), activation="relu"))
+
 model.add(Dense(1))
 
 This Covnet was based on several posts about this topic, and prove to be more capable than the LeNet 
@@ -114,7 +120,7 @@ the center as well as fast recovery for the curves.
 
 For details about how I created the training data, see the next section. 
 
-###Model Architecture and Training Strategy
+Model Architecture and Training Strategy
 
 1. Solution Design Approach
 
@@ -164,17 +170,17 @@ the system performs the following preprocess:
 7) Created the flipped (horiz mirror) version of images and of angles
 
 
-[hist 01]: ./examples/hist01.png "Original angles histogram"
+[image1]: ./examples/hist01.png "Original angles histogram"
 
-[hist 02]: ./examples/hist02.png "Filtered center angles histogram"
+[image1]: ./examples/hist02.png "Filtered center angles histogram"
 
-[image1]: ./examples/center01.png "Center image sample"
+[image3]: ./examples/center01.png "Center image sample"
 
-[image2]: ./examples/center02.png "Soft center image sample"
+[image4]: ./examples/center02.png "Soft center image sample"
 
-[image3]: ./examples/recovery01.png "Recovery"
+[image5]: ./examples/recovery01.png "Recovery"
 
-[image4]: ./examples/recovery02.png "Soft recovery"
+[image6]: ./examples/recovery02.png "Soft recovery"
 
 Form this resulting set I used 80% for training and 20% for validation.
 
