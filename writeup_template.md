@@ -58,13 +58,13 @@ to the result. That is why drive.py file was modified.
 
 Also cropping was done in the batch generator function (instead of in the same Keras sequential model).
 
-# Normalizaion: 
+Normalizaion: 
 model.add(Lambda(lambda x: x/127.5 - 1.0, input_shape=(cropped_height,cropped_width,1)))
 
 Then 3 convolutional layers of 5*5 and deph frmo 24 to 48 were added, with a regularization factor of 0.001
 and Relu activation functions:
 
-# Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
+Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
 model.add(Conv2D(24, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 model.add(Conv2D(36, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 model.add(Conv2D(48, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
@@ -72,15 +72,15 @@ model.add(Conv2D(48, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer
 Two more convolutional layers of 64 of deph each follows with the same regularization factor as the previous 3 layers:,
 and also with Relu activations:
 
-# Add 2 * 3x3 convolution layers (output depth 64, and 64)
+Add 2 * 3x3 convolution layers (output depth 64, and 64)
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
 
-# Add a flatten layer
+Add a flatten layer
 model.add(Flatten())
 
 Finally after a flatten operation, 4 fully connected layers of 100, 50, 10 and 1 were added:
-# 4 Fully connected layers of 100, 50, 10 and 1
+4 Fully connected layers of 100, 50, 10 and 1
 model.add(Dense(100, kernel_regularizer=l2(reg_factor), activation="relu"))
 model.add(Dense(50, kernel_regularizer=l2(reg_factor), activation="relu"))
 model.add(Dense(10, kernel_regularizer=l2(reg_factor), activation="relu"))
