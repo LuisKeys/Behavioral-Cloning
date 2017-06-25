@@ -60,36 +60,24 @@ Also cropping was done in the batch generator function (instead of in the same K
 
 Normalizaion: 
 model.add(Lambda(lambda x: x/127.5 - 1.0, input_shape=(cropped_height,cropped_width,1)))
-
 Then 3 convolutional layers of 5*5 and deph frmo 24 to 48 were added, with a regularization factor of 0.001
 and Relu activation functions:
-
 Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
 model.add(Conv2D(24, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Conv2D(36, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Conv2D(48, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
-
 Two more convolutional layers of 64 of deph each follows with the same regularization factor as the previous 3 layers:,
 and also with Relu activations:
-
 Add 2 * 3x3 convolution layers (output depth 64, and 64)
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
-
 Add a flatten layer
 model.add(Flatten())
-
 Finally after a flatten operation, 4 fully connected layers of 100, 50, 10 and 1 were added:
 4 Fully connected layers of 100, 50, 10 and 1
 model.add(Dense(100, kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Dense(50, kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Dense(10, kernel_regularizer=l2(reg_factor), activation="relu"))
-
 model.add(Dense(1))
 
 This Covnet was based on several posts about this topic, and prove to be more capable than the LeNet 
@@ -149,7 +137,42 @@ geomtry of the main lap geometry and texture.
 
 2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+Final model architecture was described in point 1, and it is basically composed by
+the following layers:
+
+Normalizaion: 
+model.add(Lambda(lambda x: x/127.5 - 1.0, input_shape=(cropped_height,cropped_width,1)))
+
+Then 3 convolutional layers of 5*5 and deph frmo 24 to 48 were added, with a regularization factor of 0.001
+and Relu activation functions:
+
+Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
+model.add(Conv2D(24, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Conv2D(36, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Conv2D(48, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
+Two more convolutional layers of 64 of deph each follows with the same regularization factor as the previous 3 layers:,
+and also with Relu activations:
+
+Add 2 * 3x3 convolution layers (output depth 64, and 64)
+model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Conv2D(64, (3, 3), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
+
+Add a flatten layer
+model.add(Flatten())
+
+Finally after a flatten operation, 4 fully connected layers of 100, 50, 10 and 1 were added:
+4 Fully connected layers of 100, 50, 10 and 1
+model.add(Dense(100, kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Dense(50, kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Dense(10, kernel_regularizer=l2(reg_factor), activation="relu"))
+
+model.add(Dense(1))
 
 3. Creation of the Training Set & Training Process
 
@@ -170,17 +193,17 @@ the system performs the following preprocess:
 7) Created the flipped (horiz mirror) version of images and of angles
 
 
-[image1]: ./examples/hist01.png "Original angles histogram"
+[image1]: ./examples/hist01.jpg "Original angles histogram"
 
-[image1]: ./examples/hist02.png "Filtered center angles histogram"
+[image1]: ./examples/hist02.jpg "Filtered center angles histogram"
 
-[image3]: ./examples/center01.png "Center image sample"
+[image3]: ./examples/center01.jpg "Center image sample"
 
-[image4]: ./examples/center02.png "Soft center image sample"
+[image4]: ./examples/center02.jpg "Soft center image sample"
 
-[image5]: ./examples/recovery01.png "Recovery"
+[image5]: ./examples/recovery01.jpg "Recovery"
 
-[image6]: ./examples/recovery02.png "Soft recovery"
+[image6]: ./examples/recovery02.jpg "Soft recovery"
 
 Form this resulting set I used 80% for training and 20% for validation.
 
