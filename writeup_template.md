@@ -198,10 +198,23 @@ I found that for this covnet and for the selected data 6 epochs was optimal,
 although with more epochs error was lower, with just 6 the model gemeralized 
 quite good and this prevented overfitting.
 
+Original angles histogram:
 ![image1](./examples/hist01.png "Original angles histogram")
+
+Filtered center angles histogram:
 ![image2]( ./examples/hist02.png "Filtered center angles histogram")
+
+Original angles histogram:
 ![image3]( ./examples/epochs.png "Original angles histogram")
+
+Center image sample:
 ![image4]( ./examples/center01.jpg "Center image sample")
+
+Soft center image sample:
 ![image5]( ./examples/center02.jpg "Soft center image sample")
+
+Recovery:
 ![image6]( ./examples/recovery01.jpg "Recovery")
+
+Soft recovery:
 ![image7]( ./examples/recovery02.jpg "Soft recovery")
