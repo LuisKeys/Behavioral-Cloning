@@ -47,33 +47,44 @@ plt.show()
 
 # Filter center values to reduce their frequency
 output_values_steering = []
-center_counter = 0
+center_counter1 = 0
 for sample in samples_buffer:
     center_value = float(sample[3])
     if center_value < 0.00 or center_value > 0.2:
         output_values_steering.append(center_value)
         samples.append(sample)
-    if center_value >= 0.0 and center_value <= 0.2:
-        if center_counter >= 3:
+    if center_value >= 0.00 and center_value <= 0.2:
+        if center_counter1 >= 4:
             output_values_steering.append(center_value)
             samples.append(sample)
-            center_counter = 0
-        center_counter += 1
+            center_counter1 = 0
+        center_counter1 += 1
+
+output_values_steering_buffer = []
+for sample in output_values_steering:
+    output_values_steering_buffer.append(-sample)
+    output_values_steering_buffer.append(sample)
+        
+        
 
 # Plot distribution of samples steering initial angles after prefiltering central angle samples
-plt.hist(output_values_steering)
+plt.hist(output_values_steering_buffer)
 plt.title("Steering angles Histogram after filtering")
 plt.xlabel("Value")
 plt.ylabel("Frequency")
 plt.gcf()
 plt.show()
 
+output_values_steering_buffer = []
+
+
 print('Amount of data items:' + str(len(samples) * factor_for_pre_process))
 
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
-
-print('Amount of train items:' + str(len(train_samples) * factor_for_pre_process))
-print('Amount of validation items:' + str(len(validation_samples) * factor_for_pre_process))
+total_train_samples = len(train_samples)
+total_validation_samples = len(validation_samples)
+print('Amount of train items:' + str(total_train_samples * factor_for_pre_process))
+print('Amount of validation items:' + str(total_validation_samples * factor_for_pre_process))
 
 # read images and output values
 print('Reading output values and images...')
@@ -84,13 +95,15 @@ cropped_height = 66
 cropped_width = 200
 batch_size = 32
 
-# Format image to [50, 260, 1]
-def format_image(X):
-    X_proc = np.zeros((cropped_height, cropped_width, 1))
-    for x in range(0, cropped_width - 1):
-        for y in range(0, cropped_height - 1):
-            X_proc[y, x, 0] = X[y, x]
-    return X_proc
+def format_image(img):
+    # crop to 66*320*3
+    ret_img = img[70:70 + cropped_height,:,:]
+    # apply little blur
+    ret_img = cv2.GaussianBlur(ret_img, (3,3), 0)
+    # scale to 66x200x3
+    ret_img = cv2.resize(ret_img,(200, 66), interpolation = cv2.INTER_AREA)
+    # convert to YUV color space
+    return  cv2.cvtColor(ret_img, cv2.COLOR_BGR2YUV)
 
 # Generator to process data on demand and be able to process large amount of samples
 def generator(samples, batch_size=batch_size):
@@ -108,10 +121,6 @@ def generator(samples, batch_size=batch_size):
                     image_full_filename = image_file_name.split('/')[-1]
                     image_path = base_path + 'IMG/' + image_full_filename
                     image = cv2.imread(image_path)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                    image = image[70:70 + cropped_height, 60:60 + cropped_width]
-                    # plt.imshow(image, cmap = "gray")
-                    # plt.show()            
                     input_images.append(image)
 
                 output_value_steering = float(batch_sample[3])
@@ -134,7 +143,7 @@ def generator(samples, batch_size=batch_size):
             input_images = []
             output_values = []
             
-            X_train_data = np.zeros((len(aug_input_images), cropped_height, cropped_width, 1))
+            X_train_data = np.zeros((len(aug_input_images), cropped_height, cropped_width, 3))
             counter = 0
             for aug_input_image in aug_input_images:
                 X_train_data[counter] =  format_image(aug_input_image)
@@ -147,20 +156,20 @@ def generator(samples, batch_size=batch_size):
             aug_input_images = []
             aug_output_values = []
             yield sklearn.utils.shuffle(X_train_data, y_train_data)
-            
-            
-            
+           
+        
 
 # compile and train the model using the generator function
 train_generator = generator(train_samples, batch_size=batch_size)
 validation_generator = generator(validation_samples, batch_size=batch_size)
 
-reg_factor = 0.001
+reg_factor = 0.0005
+num_epochs = 2
 
 #create a LeNet covnet with keras
 model = Sequential()
 # Normalize
-model.add(Lambda(lambda x: x/127.5 - 1.0, input_shape=(cropped_height,cropped_width,1)))
+model.add(Lambda(lambda x: x/127.5 - 1.0, input_shape=(cropped_height, cropped_width, 3)))
 
 # Add 3 * 5x5 convolution layers (output depth 24, 36, and 48), each with 2x2 stride
 model.add(Conv2D(24, (5, 5), strides=(2, 2), padding='valid', kernel_regularizer=l2(reg_factor), activation="relu"))
@@ -183,9 +192,10 @@ model.add(Dense(1))
 print('Training NN...')
 model.compile(optimizer=Adam(lr=1e-4), loss='mse')
 fit_history = model.fit_generator(train_generator, 
-                                  steps_per_epoch=int(len(train_samples) / batch_size), 
+                                  steps_per_epoch=int(total_train_samples / batch_size * factor_for_pre_process), 
                                   validation_data=validation_generator,
-                                  validation_steps=int(len(validation_samples) / batch_size), epochs=6, verbose=1)
+                                  validation_steps=int(total_validation_samples / batch_size * factor_for_pre_process), 
+                                  epochs=num_epochs, verbose=1)
 
 # Plot cost history
 plt.plot(fit_history.history['loss'])

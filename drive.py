@@ -51,16 +51,15 @@ controller.set_desired(set_speed)
 cropped_height = 66
 cropped_width = 200
 
-
-# Format image to [66, 320, 1]
-def format_image(X):
-    X_proc = np.zeros((cropped_height, cropped_width, 1))
-    
-    for x in range(0, cropped_width-1):
-        for y in range(0, cropped_height-1):
-            X_proc[y, x, 0] = X[y, x]
-    return X_proc
-
+def format_image(img):
+    # crop to 66*320*3
+    ret_img = img[70:70+cropped_height,:,:]
+    # apply little blur
+    ret_img = cv2.GaussianBlur(ret_img, (3,3), 0)
+    # scale to 66x200x3
+    ret_img = cv2.resize(ret_img,(200, 66), interpolation = cv2.INTER_AREA)
+    # convert to YUV color space
+    return  cv2.cvtColor(ret_img, cv2.COLOR_RGB2YUV)
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -75,11 +74,8 @@ def telemetry(sid, data):
         imgString = data["image"]
         ori_image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(ori_image)
-        image = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
-        image = image[70:70 + cropped_height, 60:60 + cropped_width]
-        image = format_image(image)
-        X_train_data = np.zeros((1, cropped_height, cropped_width, 1))
-        X_train_data[0] =  format_image(image)
+        X_train_data = np.zeros((1, cropped_height, cropped_width, 3))
+        X_train_data[0] = format_image(image_array)
 
         steering_angle = float(model.predict(X_train_data, batch_size=1))
 
@@ -91,7 +87,7 @@ def telemetry(sid, data):
         # save frame
         timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
         image_filename = os.path.join(base_path, timestamp)
-        # ori_image.save('{}.jpg'.format(image_filename))
+        ori_image.save('{}.jpg'.format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.
         sio.emit('manual', data={}, skip_sid=True)
