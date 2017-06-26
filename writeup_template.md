@@ -46,14 +46,14 @@ The model.py file contains the code for training and saving the convolution neur
 The file shows the pipeline I used for training and validating the model, 
 and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
 1. An appropriate model architecture has been employed
 
 My model consists of the following architecture (lines 170 to 189 of model.py):
 
 The model is feeded with a processed image, cropped, apply a soft blur and resized, 
-and converted to YUV color space, the resulting image has the shape: 66*200*3
+and converted to YUV color space, the resulting image has the shape: 66 * 200 * 3
 After several hours of testing with different settings and due to my 
 hardware limitations (and i3, no GPU and 8Gb of Ram). image was limited 
 to meaningfull information. drive.py file was modified accordingly.
@@ -145,7 +145,7 @@ implemented the generators, it was a bit of overhead for its ram and processing 
 I decided to read a bit about NVidia Covnet and found that YUV color space was recommended, 
 and also performed the cropping, blur and resizing.
 I started with a vertical cropping and then also added an horizontal resize, 
-ending with a 66*200 version, which even generalized better.
+ending with a 66 * 200 version, which even generalized better.
 
 But the key was to make a more uniform steering angles histogram, filtering center samples, 
 that was what really makes the difference, even with a reduced number of samples.
@@ -205,16 +205,16 @@ The system performs the following preprocess:
 2) Shuffle the samples
 3) Get the 3 cameras for each sample (left, right and center)
 4) Add correction for the steering angle for left and right
-5) Created the flipped (horiz mirror) version of images and of angles
+5) Creat the flipped (horiz mirror) version of images and of angles
 6) Cropp images from 132 * 320 to 66 * 320
 7) Add soft blur
-8) resize from 66*320 to 66*200
-9) convert form RBG to YUV color space
+8) Resize from 66 * 320 to 66 * 200
+9) Convert form RBG to YUV color space
 
 Form this resulting set I used 80% for training and 20% for validation.
 
-I found that for this covnet and for the selected data 6 epochs was optimal, 
-although with more epochs error was lower, with just 6 the model gemeralized 
+I found that for this covnet and for the selected data 2 epochs was optimal, 
+although with more epochs error was lower, with just 2 the model generalized 
 quite good and this prevented overfitting.
 
 Original angles histogram:
